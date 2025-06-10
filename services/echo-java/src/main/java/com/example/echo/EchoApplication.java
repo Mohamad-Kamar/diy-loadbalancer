@@ -1,15 +1,15 @@
 package com.example.echo;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 public class EchoApplication {
 
@@ -30,7 +30,7 @@ public class EchoApplication {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             String method = exchange.getRequestMethod();
-            System.out.println("Echo request: " + method + " " + exchange.getRequestURI());
+            System.out.println("Echo java request: POST /");
             
             if ("POST".equalsIgnoreCase(method)) {
                 InputStream requestBodyStream = exchange.getRequestBody();
@@ -44,7 +44,7 @@ public class EchoApplication {
                 responseBody.write(bodyBytes);
                 responseBody.close();
                 
-                System.out.println("Echo response sent successfully");
+                System.out.println("Echo java response sent successfully");
             } else {
                 System.out.println("Echo: Method not allowed - " + method);
                 // Method Not Allowed
