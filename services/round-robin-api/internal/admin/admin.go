@@ -71,12 +71,28 @@ func validateBackendURL(rawURL string) (string, error) {
 
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return "", fmt.Errorf("invalid URL format")
+		return "", fmt.Errorf("invalid URL format: %v", err)
 	}
 
 	// Ensure scheme is present
 	if u.Scheme == "" {
 		u.Scheme = "http"
+	} else if u.Scheme != "http" && u.Scheme != "https" {
+		return "", fmt.Errorf("invalid URL scheme: must be http or https")
+	}
+
+	// Validate host and port
+	if u.Host == "" {
+		return "", fmt.Errorf("invalid URL: host is required")
+	}
+
+	// If port is not specified, use default ports
+	if u.Port() == "" {
+		if u.Scheme == "https" {
+			u.Host = u.Host + ":443"
+		} else {
+			u.Host = u.Host + ":80"
+		}
 	}
 
 	return u.String(), nil

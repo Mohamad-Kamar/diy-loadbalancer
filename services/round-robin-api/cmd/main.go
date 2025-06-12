@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -138,30 +139,40 @@ func (lb *LoadBalancer) forwardRequest(backend *Backend, r *http.Request) (*http
 	// Create new request with timeout context
 	req, err := http.NewRequestWithContext(ctx, r.Method, backend.URL+"/", r.Body)
 	if err != nil {
-		lb.metrics.RecordError(backend.URL)
+		lb.metrics.RecordRequestComplete(r.Header.Get("X-Request-ID"), backend.URL, time.Since(start), false)
 		return nil, err
 	}
-	req.Header = r.Header
+
+	// Copy headers
+	for key, values := range r.Header {
+		req.Header[key] = values
+	}
+
+	// Add or update request ID
+	requestID := r.Header.Get("X-Request-ID")
+	if requestID == "" {
+		requestID = fmt.Sprintf("%d", time.Now().UnixNano())
+		req.Header.Set("X-Request-ID", requestID)
+	}
 
 	// Forward the request
 	resp, err := lb.client.Do(req)
+	duration := time.Since(start)
+	
 	if err != nil {
 		backend.breaker.RecordFailure()
-		lb.metrics.RecordError(backend.URL)
+		lb.metrics.RecordRequestComplete(requestID, backend.URL, duration, false)
 		return nil, err
 	}
 
-	// Record success if status code is okay
-	if resp.StatusCode < 500 {
+	success := resp.StatusCode < 500
+	if success {
 		backend.breaker.RecordSuccess()
 	} else {
 		backend.breaker.RecordFailure()
-		lb.metrics.RecordError(backend.URL)
 	}
 
-	// Record response time
-	lb.metrics.RecordResponseTime(backend.URL, time.Since(start))
-
+	lb.metrics.RecordRequestComplete(requestID, backend.URL, duration, success)
 	return resp, nil
 }
 
