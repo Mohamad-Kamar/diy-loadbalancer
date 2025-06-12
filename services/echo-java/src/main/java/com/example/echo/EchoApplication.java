@@ -57,7 +57,7 @@ public class EchoApplication {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             String method = exchange.getRequestMethod();
-            System.out.println("Health check: " + method + " " + exchange.getRequestURI());
+            System.out.println("[java] Health check: " + method + " " + exchange.getRequestURI());
             
             if ("GET".equalsIgnoreCase(method)) {
                 String response = "{\"status\":\"ok\"}";
@@ -70,9 +70,9 @@ public class EchoApplication {
                 responseBody.write(responseBytes);
                 responseBody.close();
                 
-                System.out.println("Health check response sent: " + response);
+                System.out.println("[java] Health check response sent: " + response);
             } else {
-                System.out.println("Health: Method not allowed - " + method);
+                System.out.println("[java] Health: Method not allowed - " + method);
                 // Method Not Allowed
                 exchange.sendResponseHeaders(405, -1); 
             }

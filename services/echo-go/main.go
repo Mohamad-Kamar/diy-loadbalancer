@@ -16,8 +16,10 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("[go] Health check: %s %s\n", r.Method, r.URL.Path)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"status":"ok"}`))
+	fmt.Println("[go] Health check response sent: {\"status\":\"ok\"}")
 }
 
 func main() {
