@@ -135,7 +135,7 @@ docs/           # OpenAPI, ADRs, architecture docs
 ---
 
 ## Authors & Credits
-- [Your Name Here]
+- Kamar
 - Inspired by industry best practices (NGINX, Envoy, AWS ALB, etc.)
 
 ---
