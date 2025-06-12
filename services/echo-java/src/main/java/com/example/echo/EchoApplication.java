@@ -23,14 +23,14 @@ public class EchoApplication {
         // Using a fixed thread pool, adjust as needed
         server.setExecutor(Executors.newFixedThreadPool(10)); 
         server.start();
-        System.out.println("Java echo server started on port " + port);
+        System.out.println("[java] Server started on port " + port);
     }
 
     static class EchoHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             String method = exchange.getRequestMethod();
-            System.out.println("Echo java request: POST /");
+            System.out.println("[java] Received request: " + method + " " + exchange.getRequestURI());
             
             if ("POST".equalsIgnoreCase(method)) {
                 InputStream requestBodyStream = exchange.getRequestBody();
@@ -44,7 +44,7 @@ public class EchoApplication {
                 responseBody.write(bodyBytes);
                 responseBody.close();
                 
-                System.out.println("Echo java response sent successfully");
+                System.out.println("[java] Request processed successfully");
             } else {
                 System.out.println("Echo: Method not allowed - " + method);
                 // Method Not Allowed
