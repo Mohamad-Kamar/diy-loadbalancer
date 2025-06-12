@@ -15,3 +15,5 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(8082, () => console.log('[node] Server started on port 8082'));
+
+module.exports = app;
