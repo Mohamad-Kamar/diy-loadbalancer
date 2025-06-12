@@ -113,6 +113,93 @@ See [`docs/openapi.yaml`](docs/openapi.yaml) for full OpenAPI spec.
 
 ---
 
+## Testing Guide
+
+### Running All Tests
+```bash
+# Run all tests (unit tests + integration tests)
+./test.sh
+
+# Run quick tests (only for changed services)
+./quick-test.sh
+
+# Clean up all build artifacts and containers
+./cleanup.sh
+```
+
+### Test Categories
+
+#### 1. Unit Tests
+- **Round Robin API (Go)**:
+  - Load balancer logic
+  - Circuit breaker behavior
+  - Health check system
+  - Backend management
+  
+- **Echo Services**:
+  - Request handling
+  - Health endpoint
+  - Error scenarios
+
+#### 2. Integration Tests
+- **Backend Management**:
+  - Adding/removing backends dynamically
+  - Validation of backend URLs
+  - Health status updates
+
+- **Request Distribution**:
+  - Round robin distribution verification
+  - Headers and payload forwarding
+  - Response consistency
+
+- **Fault Tolerance**:
+  - Circuit breaker activation
+  - Recovery from backend failures
+  - Timeout handling
+  - Load shedding
+
+#### 3. Operational Tests
+- **Performance**:
+  - Load testing (using hey or ab)
+  - Response time measurements
+  - Resource utilization
+
+- **Failure Simulation**:
+  ```bash
+  # Add latency to a backend
+  ./scripts/add-latency.sh echo-node 500ms
+
+  # Simulate CPU load
+  ./scripts/cpu-stress.sh echo-java 80%
+
+  # Stop a backend
+  docker-compose stop echo-go
+
+  # Start a backend
+  docker-compose start echo-go
+  ```
+
+### Test Coverage Goals
+- Unit test coverage: >80%
+- Integration test scenarios: >90%
+- All critical paths tested
+- Fault injection for all failure modes
+
+### Continuous Testing
+The test suite is designed to run in CI/CD pipelines:
+```bash
+# Build all services
+docker-compose build
+
+# Run test suite
+./scripts/run-all-tests.sh
+
+# Clean up
+docker-compose down
+```
+
+---
+
 ## Project Structure
 ```
 services/
@@ -141,4 +228,4 @@ docs/           # OpenAPI, ADRs, architecture docs
 ---
 
 ## License
-MIT (or your choice)
+MIT
