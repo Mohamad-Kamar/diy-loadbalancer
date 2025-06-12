@@ -1,0 +1,56 @@
+services:
+  round-robin-api:
+    build: ./services/round-robin-api
+    ports:
+      - "8080:8080"
+    environment:
+      - BACKENDS=http://echo-go:8081,http://echo-node:8082,http://echo-java:8083
+    depends_on:
+      - echo-go
+      - echo-node
+      - echo-java
+    develop:
+      watch:
+        - path: ./services/round-robin-api/cmd
+          target: /app/cmd
+          action: sync
+
+  echo-go:
+    build: ./services/echo-go
+    ports:
+      - "8081:8081"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '128M'
+    develop:
+      watch:
+        - path: ./services/echo-go
+          target: /app
+          action: sync+restart
+
+  echo-node:
+    build: ./services/echo-node
+    ports:
+      - "8082:8082"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.7'
+          memory: '256M'
+    develop:
+      watch:
+        - path: ./services/echo-node
+          target: /app
+          action: sync+restart
+
+  echo-java:
+    build: ./services/echo-java
+    ports:
+      - "8083:8083"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '512M'
