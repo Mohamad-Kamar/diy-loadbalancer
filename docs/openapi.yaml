@@ -1,0 +1,83 @@
+openapi: 3.0.0
+info:
+  title: DIY Load Balancer API
+  version: 1.0.0
+description: |
+  API documentation for the round-robin load balancer and admin endpoints.
+paths:
+  /api:
+    post:
+      summary: Echo POST endpoint (proxied to backend)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Echoed response from backend
+          content:
+            application/json:
+              schema:
+                type: object
+  /admin/backends:
+    get:
+      summary: List all backend URLs
+      responses:
+        '200':
+          description: List of backends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      summary: Add a backend
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+      responses:
+        '200':
+          description: Backend added
+    delete:
+      summary: Remove a backend
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+      responses:
+        '200':
+          description: Backend removed
+  /admin/metrics:
+    get:
+      summary: Get metrics
+      responses:
+        '200':
+          description: Metrics object
+          content:
+            application/json:
+              schema:
+                type: object
+  /admin/health:
+    get:
+      summary: Get health status
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                type: object

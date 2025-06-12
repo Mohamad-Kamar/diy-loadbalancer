@@ -1,49 +1,144 @@
 # diy-loadbalancer
 
-## Usage
+## Overview
+Load balancer and echo service platform. This project demonstrates distributed systems best practices: resilience, observability, and dynamic configuration. It features a custom round-robin load balancer (Go) and three echo backends (Go, Node.js, Java), all containerized and ready for real-world failure scenarios.
 
-### Option 1: Docker (Recommended)
+---
 
+## Features
+- **Custom Round-Robin Load Balancer** (Go)
+- **Polyglot Echo Backends**: Go, Node.js, Java
+- **Dynamic Backend Management**: Add/remove backends at runtime via Admin API
+- **Fault Tolerance**: Health checks, circuit breaker, request timeouts
+- **Observability**: Metrics, request tracing, distribution stats
+- **Zero-Downtime Config Reload**
+- **Comprehensive Test Suite**: Unit, integration, and operational tests
+- **Failure Simulation Scripts**: Latency and CPU stress injection
+- **Containerized Deployment**: Docker Compose for easy orchestration
+
+---
+
+## Architecture
+```
+[Client] ⇄ [Load Balancer (Go)] ⇄ [Echo Backends: Go | Node.js | Java]
+```
+- **/api**: Main POST endpoint, round-robin to healthy backends
+- **/admin/**: Admin API for metrics, health, and backend management
+
+---
+
+## Quick Start
+
+### Option 1: Docker Compose (Recommended)
 ```bash
 docker-compose up --build
 ```
+- Load balancer: http://localhost:8080
+- Backends: http://localhost:8081 (Go), :8082 (Node), :8083 (Java)
 
-### Option 2: Manual Setup (Development)
-
-1. **Start the backend echo services** (in separate terminals):
-
+### Option 2: Manual (Development)
+Start each backend in its directory:
 ```bash
-# Terminal 1: Go echo service
-cd services/echo-go
+# Go backend
 go run main.go
-
-# Terminal 2: Node.js echo service  
-cd services/echo-node
+# Node backend
 node index.js
-
-# Terminal 3: Java echo service
-cd services/echo-java
+# Java backend
 mvn exec:java
 ```
-
-2. **Start the round-robin load balancer**:
-
+Start the load balancer:
 ```bash
-# Terminal 4: Load balancer
 cd services/round-robin-api
 ./run.sh
-```
-
-Or manually with environment variables:
-```bash
-cd services/round-robin-api
+# or
 BACKENDS=http://localhost:8081,http://localhost:8082,http://localhost:8083 go run cmd/main.go
 ```
 
-### Test Round Robin
+---
 
-```bash
-bash tests/integration/test_round_robin.sh
+## API Reference
+See [`docs/openapi.yaml`](docs/openapi.yaml) for full OpenAPI spec.
+
+### Main Endpoints
+- `POST /api` — Echo POST, round-robin to healthy backend
+- `GET /admin/metrics` — Metrics and request distribution
+- `GET /admin/health` — Backend health status
+- `GET /admin/backends` — List backends
+- `POST /admin/backends` — Add backend (`{"url": "http://..."}`)
+- `DELETE /admin/backends` — Remove backend (`{"url": "http://..."}`)
+
+---
+
+## Dynamic Backend Management
+- Add/remove backends at runtime via Admin API (see above)
+- No restart required; config reloads live
+
+---
+
+## Observability & Metrics
+- Request counts, error rates, response times per backend
+- Circuit breaker state
+- Recent request log
+- All available at `/admin/metrics`
+
+---
+
+## Testing & Quality Assurance
+
+### Unit Tests
+- **Go**: `go test ./...` in each Go service directory
+- **Node.js**: `npm test` (uses Jest & Supertest)
+- **Java**: `mvn test` (JUnit 5)
+
+### Integration & Operational Tests
+- Run all integration tests:
+  ```bash
+  ./scripts/run-all-tests.sh
+  ```
+- See `tests/integration/` for round-robin, failure, and observability tests
+
+### Failure Simulation
+- **Add latency:**
+  ```bash
+  ./scripts/add-latency.sh <container_name> <latency>
+  # Example: ./scripts/add-latency.sh echo-node 500ms
+  ```
+- **CPU stress:**
+  ```bash
+  ./scripts/cpu-stress.sh <container_name> <percent>
+  # Example: ./scripts/cpu-stress.sh echo-java 80%
+  ```
+- Remove latency: `docker exec <container> tc qdisc del dev eth0 root netem || true`
+- Stop stress: `docker exec <container> pkill stress || true`
+
+---
+
+## Project Structure
+```
+services/
+  echo-go/      # Go echo backend
+  echo-node/    # Node.js echo backend
+  echo-java/    # Java echo backend
+  round-robin-api/ # Go load balancer
+scripts/        # Test and simulation scripts
+tests/          # Integration tests
+docs/           # OpenAPI, ADRs, architecture docs
 ```
 
-You should see responses from all three backends in turn.
+---
+
+## Contributing
+- Fork and PRs welcome!
+- See `docs/adr-template.md` for architecture decision records
+- Please add/extend unit and integration tests for new features
+
+---
+
+## Authors & Credits
+- [Your Name Here]
+- Inspired by industry best practices (NGINX, Envoy, AWS ALB, etc.)
+
+---
+
+## License
+MIT (or your choice)
