@@ -28,6 +28,9 @@ func NewHealthChecker() *HealthChecker {
 
 // StartChecking begins periodic health checks for a backend
 func (hc *HealthChecker) StartChecking(url string, interval time.Duration) {
+	// Set initial health status to true (optimistic)
+	hc.setHealth(url, true)
+	
 	go func() {
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
