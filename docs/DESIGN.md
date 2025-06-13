@@ -1,3 +1,9 @@
+# Project Design and Architecture
+
+This document contains the original project planning, architecture decisions, and design rationale for the DIY Load Balancer system.
+
+> **📚 Documentation**: This document is part of the [complete documentation suite](../README.md#-documentation). For usage instructions see the [main README](../README.md), and for testing procedures see [`TESTING.md`](../TESTING.md).
+
 ## Executive Summary
 
 This assignment is an opportunity to demonstrate **distributed systems expertise** beyond basic load balancing. The focus should be on building a **resilient, observable foundation** that handles real-world failure scenarios while showcasing custom implementation skills.

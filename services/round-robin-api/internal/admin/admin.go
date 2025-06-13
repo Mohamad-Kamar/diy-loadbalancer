@@ -134,7 +134,11 @@ func (s *AdminServer) HandleBackends(w http.ResponseWriter, r *http.Request) {
 			})
 		} else {
 			s.lb.RemoveBackend(normalizedURL)
-			w.WriteHeader(http.StatusNoContent)
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]string{
+				"status": "removed",
+				"backend": normalizedURL,
+			})
 		}
 
 	default:

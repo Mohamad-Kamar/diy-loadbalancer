@@ -1,9 +1,11 @@
 # Test Plan
 
-## 1. Backend Management Tests
+## Core Test Areas
 
-### Add Backend Tests
-- Add valid backend URL
+### 1. Backend Management
+- Add/remove backends
+- Health check verification
+- Invalid configurations
 - Add duplicate backend URL (should fail)
 - Add invalid backend URL (should fail)
 - Add backend with incorrect port (should fail)
@@ -81,13 +83,33 @@
 - Validate health checks
 - Monitor system metrics
 
-## Test Execution:
+## Test Execution
 
 ### Prerequisites
 1. Docker and Docker Compose installed
-2. hey or ab for load testing
-3. curl for API testing
-4. jq for JSON processing
+2. curl for API testing
+3. jq for JSON processing
+
+### Running Tests
+```bash
+# Start services
+docker-compose up -d
+
+# Run test suites
+./quick-test.sh      # Quick validation
+./test.sh           # Full test suite
+
+# Specific tests
+./tests/integration/test_round_robin.sh
+./tests/integration/test_phase3.sh
+```
+
+### Success Criteria
+- All unit tests passing
+- Response time < 50ms
+- Error rate < 1%
+- Even request distribution
+- Clean failure handling
 
 ### Running Tests
 ```bash
@@ -95,15 +117,22 @@
 docker-compose up -d
 
 # 2. Run all tests
-make test
+./test.sh           # Full test suite
+./quick-test.sh     # Quick validation
 
 # 3. Run specific test categories
-make test-unit
-make test-integration
-make loadtest
+# Unit tests:
+cd services/round-robin-api && go test ./internal/... -v  # Round Robin API
+cd services/echo-go && go test -v                         # Echo Go Service
+cd services/echo-node && npm test                         # Echo Node Service
+cd services/echo-java && mvn test                         # Echo Java Service
+
+# Integration tests:
+./tests/integration/test_round_robin.sh
+./tests/integration/test_phase3.sh
 
 # 4. Cleanup
-make clean
+./cleanup.sh
 ```
 
 ### Monitoring Tests
