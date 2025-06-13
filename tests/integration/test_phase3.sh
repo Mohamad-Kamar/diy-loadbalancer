@@ -17,15 +17,18 @@ check_health() {
     for i in {1..30}; do
         health_response=$(curl -s "$API_URL/admin/health")
         if [[ $health_response == *"\"status\":\"ok\""* ]]; then
-        echo "✅ Health check passed"
-        echo "Current backends:"
-        echo "$health_response" | format_json
-        return 0
-    else
-        echo "❌ Health check failed"
-        echo "$health_response"
-        return 1
-    fi
+            echo "✅ Health check passed"
+            echo "Current backends:"
+            echo "$health_response" | format_json
+            return 0
+        else
+            echo "❌ Health check failed, attempt $i/30"
+            sleep 1
+        fi
+    done
+    echo "❌ Health check failed after 30 attempts"
+    echo "$health_response"
+    return 1
 }
 
 # Function to send test requests and verify round-robin distribution

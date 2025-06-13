@@ -1,25 +1,22 @@
 package com.example.echo;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.jupiter.api.AfterAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -32,7 +29,7 @@ public class EchoApplicationTest {
             .build();
 
     @BeforeAll
-    static void setup() throws IOException {
+    static void setup() throws IOException, InterruptedException {
         CompletableFuture.runAsync(() -> {
             try {
                 EchoApplication.main(new String[]{});
