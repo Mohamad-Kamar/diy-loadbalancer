@@ -35,8 +35,8 @@ func NewCircuitBreaker() *CircuitBreaker {
 
 // IsAvailable checks if the circuit is closed or can be tested (half-open)
 func (cb *CircuitBreaker) IsAvailable() bool {
-	cb.RLock()
-	defer cb.RUnlock()
+	cb.Lock()
+	defer cb.Unlock()
 
 	switch cb.state {
 	case CLOSED:
@@ -44,7 +44,8 @@ func (cb *CircuitBreaker) IsAvailable() bool {
 	case OPEN:
 		// Check if enough time has passed to move to half-open
 		if time.Since(cb.lastFailureTime) > cb.timeout {
-			cb.toHalfOpen()
+			cb.state = HALF_OPEN
+			cb.failureCount = 0
 			return true
 		}
 		return false
@@ -78,17 +79,6 @@ func (cb *CircuitBreaker) RecordFailure() {
 		cb.state = OPEN
 	} else if cb.state == HALF_OPEN {
 		cb.state = OPEN
-	}
-}
-
-// toHalfOpen moves the circuit to half-open state (helper function)
-func (cb *CircuitBreaker) toHalfOpen() {
-	cb.Lock()
-	defer cb.Unlock()
-
-	if cb.state == OPEN {
-		cb.state = HALF_OPEN
-		cb.failureCount = 0
 	}
 }
 
